@@ -94,7 +94,7 @@ func (s *StatFilter) Run(fr FilterRunner, h PluginHelper) (err error) {
 		for _, field := range pack.Message.Fields {
 			// It's painful to be converting these numeric values to strings,
 			// but for now it's the only way to get numeric data into the stat
-			// accumulator.
+			// accumulator
 			if field.GetValueType() == message.Field_STRING && len(field.ValueString) > 0 {
 				val = field.ValueString[0]
 			} else if field.GetValueType() == message.Field_DOUBLE {
