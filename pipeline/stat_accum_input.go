@@ -45,9 +45,9 @@ type StatAccumulator interface {
 
 type StatAccumInput struct {
 	statChan chan Stat
-	counters map[string]int
+	counters map[string]float64
 	timers   map[string][]float64
-	gauges   map[string]float32
+	gauges   map[string]float64
 	pConfig  *PipelineConfig
 	config   *StatAccumInputConfig
 	ir       InputRunner
@@ -118,9 +118,9 @@ func (sm *StatAccumInput) SetPipelineConfig(pConfig *PipelineConfig) {
 }
 
 func (sm *StatAccumInput) Init(config interface{}) error {
-	sm.counters = make(map[string]int)
+	sm.counters = make(map[string]float64)
 	sm.timers = make(map[string][]float64)
-	sm.gauges = make(map[string]float32)
+	sm.gauges = make(map[string]float64)
 	sm.statChan = make(chan Stat, sm.pConfig.Globals.PoolSize)
 	sm.stopChan = make(chan bool, 1)
 
@@ -158,11 +158,11 @@ func (sm *StatAccumInput) Run(ir InputRunner, h PluginHelper) (err error) {
 				floatValue, _ = strconv.ParseFloat(stat.Value, 64)
 				sm.timers[stat.Bucket] = append(sm.timers[stat.Bucket], floatValue)
 			case "g":
-				floatValue, _ = strconv.ParseFloat(stat.Value, 32)
-				sm.gauges[stat.Bucket] = float32(floatValue)
+				floatValue, _ = strconv.ParseFloat(stat.Value, 64)
+				sm.gauges[stat.Bucket] = float64(floatValue)
 			default:
-				floatValue, _ = strconv.ParseFloat(stat.Value, 32)
-				sm.counters[stat.Bucket] += int(float32(floatValue) * (1 / stat.Sampling))
+				floatValue, _ = strconv.ParseFloat(stat.Value, 64)
+				sm.counters[stat.Bucket] += float64(floatValue) * float64(1/stat.Sampling)
 			}
 		}
 	}
